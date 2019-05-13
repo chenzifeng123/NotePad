@@ -7,7 +7,7 @@ NOTEPAD笔记本应用
 2. 添加笔记查询功能（根据标题查询）  
 
 +附加功能  
-1. UI美化  
+1. UI美化
 2. 更改记事本的背景,更改显示条目的颜色 
 3. 笔记分类：根据显示条目的颜色进行分类
 4. 分享功能
@@ -16,7 +16,7 @@ NOTEPAD笔记本应用
 ## 三. 实验步骤
 ### （1）.程序大致理解  
 程序组成结构如下图：  
-![Image text](https://github.com/chenzifeng123/image/blob/master/Notepad001.PNG)   
+<img width="300" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad001.PNG"/>
 
 ### （2）.程序具体内容
 1. Class  
@@ -159,7 +159,8 @@ NOTEPAD笔记本应用
    
    时间显示在相应的条目上
    效果图:  
-   ![Image text](https://github.com/chenzifeng123/image/blob/master/Notepad002.PNG)  
+   <img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad002.PNG"/>
+    
    
 2. 笔记查询功能  
    SearchView搭配Toolbar实现查询功能.
@@ -315,12 +316,90 @@ NOTEPAD笔记本应用
             });
 
 效果图：  
- ![Image text](https://github.com/chenzifeng123/image/blob/master/Notepad003.PNG)  
- ![Image text](https://github.com/chenzifeng123/image/blob/master/Notepad004.PNG)  
+<img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad003.PNG"/>
+<img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad004.PNG"/>  
 
 3. 更换背景  
-   3.1  更换主界面背景
-   
+   *  更换主界面背景  
+      > 利用SharedPreferences进行设置的存储  
+       在MainActivity中自定义get和set方法获取和更改文件中的值
+
+           public void getBColor(){
+                SharedPreferences sp=getSharedPreferences("data",MODE_PRIVATE);
+                color=sp.getString("color",null);
+                if(color==null) color="#efefef";
+                    ll.setBackgroundColor(Color.parseColor(color));
+            }
+            public void setBColor(String color){
+                SharedPreferences sp=getSharedPreferences("data",MODE_PRIVATE);
+                SharedPreferences.Editor edit=sp.edit(); //获取编辑器
+                edit.putString("color",color);
+                edit.commit();
+            }
+       > 在onOptionsItemSelected函数中添加点击菜单项后改变背景颜色并将修改后的值传入文件中的操作
+        
+          //设置背景颜色
+             case R.id.lv:
+                 color="#009688";
+                 setBColor(color);
+                 ll.setBackgroundColor(Color.parseColor("#009688"));
+                 break;
+             case R.id.zi:
+                 color="#673AB7";
+                 setBColor(color);
+                 ll.setBackgroundColor(Color.parseColor("#673AB7"));
+                 break;
+             case R.id.lan:
+                 color="#2196F3";
+                 setBColor(color);
+                 ll.setBackgroundColor(Color.parseColor("#2196F3"));
+                 break;
+             case R.id.bai:
+                 color="#efefef";
+                 setBColor(color);
+                 ll.setBackgroundColor(Color.parseColor("#FFFFFF"));
+                 break;
+  > 效果图:  
+ <img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad005.PNG"/>
+ <img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad006.PNG"/>
+ 
+* 更换listitem背景  
+   > 在Cuns中添加color属性并在建表时增加color列 根据每个listitem所存的color值 获得其背景颜色  
+            
+            private String color;   //背景颜色
+
+             public void onCreate(SQLiteDatabase db) {
+                     db.execSQL("create table mybook(" +
+                             "ids integer PRIMARY KEY autoincrement," +
+                             "title text," +
+                             "content text," +
+                             "color text,"+
+                             "times text)");
+                 }
+
+    > 在MyAdapter的getView中设置背景颜色 
+
+                @Override
+                    public View getView(int position, View convertView, ViewGroup parent) {
+                        ViewHolder vh;
+                        String cl;
+                        if(convertView==null){
+                            vh=new ViewHolder();
+                            convertView=inflater.inflate(R.layout.list_item, null);//注意导包，别导系统包
+                            vh.tv1=(TextView) convertView.findViewById(R.id.textView3);
+                            vh.tv2=(TextView) convertView.findViewById(R.id.textView4);
+                            vh.linearLayoutProductNameList = convertView.findViewById(R.id.linearLayoutProductNameList);
+                            convertView.setTag(vh);
+                        }
+                        vh=(ViewHolder) convertView.getTag();
+                        vh.tv1.setText(list.get(position).getTitle());
+                        vh.tv2.setText(list.get(position).getTimes());
+                        //设置背景色
+                        vh.linearLayoutProductNameList.setBackgroundColor(Color.parseColor(list.get(position).getColor()));
+                        return convertView;
+                    }
+
+
 
 
 
