@@ -125,6 +125,48 @@ NOTEPAD笔记本应用
 * second:新建界面菜单栏，包含背景颜色，分享几个选项   
 
 ### （3）.功能介绍
+1. 笔记的增删改查和显示  
+   主要在MyDataBase中对数据库进行增删改操作
+   
+        public void toUpdate(Cuns cun){
+             myDatabase = myHelper.getWritableDatabase();
+             myDatabase.execSQL(
+                     "update mybook set title='"+ cun.getTitle()+
+                             "',times='"+cun.getTimes()+
+                             "',content='"+cun.getContent() +
+                             "',color='"+cun.getColor() +
+                             "' where ids='"+ cun.getIds()+"'");
+             myDatabase.close();
+         }
+        public void toInsert(Cuns cun){
+             myDatabase = myHelper.getWritableDatabase();
+             if(cun.getColor()==null){
+                 myDatabase.execSQL("insert into mybook(title,content,times)values('"
+                         + cun.getTitle()+"','"
+                         +cun.getContent()+"','"
+                         +cun.getTimes()
+                         +"')");
+             }else{
+                 myDatabase.execSQL("insert into mybook(title,content,color,times)values('"
+                         + cun.getTitle()+"','"
+                         +cun.getContent()+"','"
+                         +cun.getColor()+"','"
+                         +cun.getTimes()
+                         +"')");
+             }
+             myDatabase.close();
+         }
+
+         public void toDelete(int ids){
+             myDatabase  = myHelper.getWritableDatabase();
+             myDatabase.execSQL("delete from mybook where ids="+ids+"");
+             myDatabase.close();
+         }
+     
+     效果图:  
+     <img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad016.PNG"/>
+     <img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad017.PNG"/>
+         
 1. 时间戳    
  在Cuns中添加时间属性，创建数据库  
    
@@ -568,8 +610,8 @@ NOTEPAD笔记本应用
             imageButton= (DragFloatActionButton)findViewById(R.id.fb);
     
     效果图:   
-     <img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad012.mp4"/>
-    
+     <img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad018.PNG"/>
+     <img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad019.PNG"/>
     
 6. 分享功能  
     在NewNote的onOptionsItemSelected函数中添加分享功能的点击界面
@@ -584,9 +626,9 @@ NOTEPAD笔记本应用
                       break;
 
 效果图:  
-<img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad013.mp4"/>
-<img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad014.mp4"/>
-<img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad015.mp4"/>
+<img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad013.PNG"/>
+<img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad014.PNG"/>
+<img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad015.PNG"/>
 
 
 
