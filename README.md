@@ -398,7 +398,9 @@ NOTEPAD笔记本应用
                         vh.linearLayoutProductNameList.setBackgroundColor(Color.parseColor(list.get(position).getColor()));
                         return convertView;
                     }
+   > xiaoguotu                  
 
+4. 更换背景
 
 
 
