@@ -572,8 +572,21 @@ NOTEPAD笔记本应用
     
     
 6. 分享功能
+    在NewNote的onOptionsItemSelected函数中添加分享功能的点击界面
     
+          case R.id.action_settings:
+                      Intent intent=new Intent(Intent.ACTION_SEND);
+                      intent.setType("text/plain");
+                      intent.putExtra(Intent.EXTRA_TEXT,
+                              "标题："+ed1.getText().toString()+"    " +
+                                      "内容："+ed2.getText().toString());
+                      startActivity(intent);
+                      break;
 
+效果图:  
+<img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad013.mp4"/>
+<img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad014.mp4"/>
+<img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad015.mp4"/>
 
 
 
