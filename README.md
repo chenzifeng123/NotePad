@@ -126,7 +126,7 @@ NOTEPAD笔记本应用
 
 ### （3）.功能介绍
 1. 时间戳    
-   在Cuns中添加时间属性，创建数据库  
+ 在Cuns中添加时间属性，创建数据库  
    
         public void onCreate(SQLiteDatabase db) {
                 db.execSQL("create table mybook(" +
@@ -398,9 +398,180 @@ NOTEPAD笔记本应用
                         vh.linearLayoutProductNameList.setBackgroundColor(Color.parseColor(list.get(position).getColor()));
                         return convertView;
                     }
-   > xiaoguotu                  
+   > 效果图:  
+ <img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad007.PNG"/>
+ <img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad008.PNG"/>
+ 
+4. 根据背景颜色进行分类筛选  
+   在MyAdapter中添加新的过滤器用于筛选颜色  
+   
+             /**
+              *  用于实现按颜色分类
+             */
+             public Filter getFilter1() {
+                 // 如果MyFilter对象为空，那么重写创建一个
+                 if (filter1 == null) {
+                     filter1 = new MyFilter1(list);
+                 }
+                 return filter1;
+             }
+             /**
+              * 创建内部类MyFilter继承Filter类，并重写相关方法，实现数据的过滤
+              */
+             class MyFilter1 extends Filter {
+                 // 创建集合保存原始数据
+                 private ArrayList<Cuns> original = new ArrayList<Cuns>();
+                 public MyFilter1(ArrayList<Cuns> list) {
+                     this.original = list;
+                 }
+                 @Override
+                 protected FilterResults performFiltering(CharSequence constraint) {
+                     // 创建FilterResults对象
+                     FilterResults results = new FilterResults();
 
-4. 更换背景
+                     /**
+                      * 没有搜索内容的话就还是给results赋值原始数据的值和大小
+                      * 执行了搜索的话，根据搜索的规则过滤即可，最后把过滤后的数据的值和大小赋值给results
+                      *
+                      */
+                     if(TextUtils.isEmpty(constraint)){
+                         results.values = original;
+                         results.count = original.size();
+                     }else {
+                         // 创建集合保存过滤后的数据
+                         ArrayList<Cuns> mList = new ArrayList<Cuns>();
+                         // 遍历原始数据集合，根据搜索的规则过滤数据
+                         for(Cuns s: original){
+                             // 这里就是过滤规则的具体实现【根据颜色筛选】
+                             if(s.getColor().trim().toLowerCase().contains(constraint.toString().trim().toLowerCase())){
+                                 // 规则匹配的话就往集合中添加该数据
+                                 mList.add(s);
+                             }
+                         }
+                         results.values = mList;
+                         results.count = mList.size();
+                     }
+                     // 返回FilterResults对象
+                     return results;
+                 }
+                 @Override
+                 protected void publishResults(CharSequence constraint,
+                                               FilterResults results) {
+                     // 获取过滤后的数据
+                     list = (ArrayList<Cuns>) results.values;
+                     // 如果接口对象不为空，那么调用接口中的方法获取过滤后的数据，具体的实现在new这个接口的时候重写的方法里执行
+                     if(listener != null){
+                         listener.getFilterData(list);
+                     }
+                     // 刷新数据源显示
+                     notifyDataSetChanged();
+                 }
+             }
+      
+      效果图:
+      <img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad009.PNG"/>
+      <img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad010.PNG"/>
+      <img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad011.PNG"/>
+      
+5. UI美化(可移动悬浮按钮且靠左右吸附)  
+   在activity_main.xml中添加一个自定义的悬浮按钮
+   
+       <com.example.notepad2.DragFloatActionButton
+            android:id="@+id/fb"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            app:borderWidth="0dp"
+          app:backgroundTint="#FFFFFF"
+          app:rippleColor="#008577"
+            android:src="@drawable/hao"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            />
+    新建一个DragFloatActionButton继承FloatingActionButton，覆写onTouchEvent函数实现按钮的移动
+    
+        @Override
+        public boolean onTouchEvent(MotionEvent event) {
+            int rawX = (int) event.getRawX();
+            int rawY = (int) event.getRawY();
+            switch (event.getAction() & MotionEvent.ACTION_MASK) {
+                case MotionEvent.ACTION_DOWN:
+                    setPressed(true);
+                    isDrag=false;
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                    lastX=rawX;
+                    lastY=rawY;
+                    ViewGroup parent;
+                    if(getParent()!=null){
+                        parent= (ViewGroup) getParent();
+                        parentHeight=parent.getHeight();
+                        parentWidth=parent.getWidth();
+                    }
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    if(parentHeight<=0||parentWidth==0){
+                        isDrag=false;
+                        break;
+                    }else {
+                        isDrag=true;
+                    }
+                    //计算手指移动了多少
+                    int dx=rawX-lastX;
+                    int dy=rawY-lastY;
+                    //这里修复一些华为手机无法触发点击事件
+                    int distance= (int) Math.sqrt(dx*dx+dy*dy);
+                    if(distance==0){
+                        isDrag=false;
+                        break;
+                    }
+                    float x=getX()+dx;
+                    float y=getY()+dy;
+                    //检测是否到达边缘 左上右下
+                    x=x<0?0:x>parentWidth-getWidth()?parentWidth-getWidth():x;
+                    y=getY()<0?0:getY()+getHeight()>parentHeight?parentHeight-getHeight():y;
+                    setX(x);
+                    setY(y);
+                    lastX=rawX;
+                    lastY=rawY;
+                    Log.i("aa","isDrag="+isDrag+"getX="+getX()+";getY="+getY()+";parentWidth="+parentWidth);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    if(!isNotDrag()){
+                        //恢复按压效果
+                        setPressed(false);
+                        //Log.i("getX="+getX()+"；screenWidthHalf="+screenWidthHalf);
+                       /* animate().setInterpolator(new DecelerateInterpolator())
+                                .setDuration(500)
+                                .start();*/
+                        if(rawX>=parentWidth/2){
+                          //靠右吸附
+                            animate().setInterpolator(new DecelerateInterpolator())
+                                    .setDuration(500)
+                                    .xBy(parentWidth-getWidth()-getX())
+                                    .start();
+                        }else {
+                          //靠左吸附
+                            ObjectAnimator oa=ObjectAnimator.ofFloat(this,"x",getX(),0);
+                            oa.setInterpolator(new DecelerateInterpolator());
+                            oa.setDuration(500);
+                            oa.start();
+                        }
+                    }
+                    break;
+            }
+            //如果是拖拽则消s耗事件，否则正常传递即可。
+            return !isNotDrag() || super.onTouchEvent(event);
+        }
+    
+    在MainActivity中绑定悬浮按钮
+    
+            FloatingActionButton imageButton;
+            imageButton= (DragFloatActionButton)findViewById(R.id.fb);
+    
+    效果图:   
+     <img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad012.mp4"/>
+    
+    
+6. 分享功能
 
 
 
