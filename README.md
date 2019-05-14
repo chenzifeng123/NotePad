@@ -468,7 +468,7 @@ NOTEPAD笔记本应用
                  }
              }
       
-      效果图:
+      效果图:  
       <img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad009.PNG"/>
       <img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad010.PNG"/>
       <img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad011.PNG"/>
@@ -571,7 +571,7 @@ NOTEPAD笔记本应用
      <img width="280" height="500" src="https://github.com/chenzifeng123/image/blob/master/Notepad012.mp4"/>
     
     
-6. 分享功能
+6. 分享功能  
     在NewNote的onOptionsItemSelected函数中添加分享功能的点击界面
     
           case R.id.action_settings:
